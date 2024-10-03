@@ -69,6 +69,7 @@
   <ItemGroup>
     <Content Include="Appstate.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="OldAppstate.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +82,13 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="OldAppstate.aspx.cs">
+      <DependentUpon>OldAppstate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OldAppstate.aspx.designer.cs">
+      <DependentUpon>OldAppstate.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
