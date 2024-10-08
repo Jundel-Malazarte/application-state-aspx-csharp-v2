@@ -11,22 +11,26 @@
             var lastName = document.getElementById('<%= TextBox2.ClientID %>').value;
 
             var regexID = /^[0-9]+$/; // Regex for digits only
-            var regexName = /^[A-Za-z]+$/; // Regex for letters only
+            var              * 
+                         *              * regexName = /^[A-Za-z]+$/; // Regex for letters only
 
             if (!regexID.test(idNumber)) {
                 alert("Please enter a valid ID number (digits only).");
                 return false; // Prevent form submission
             }
+            /**
+                if (!regexName.test(firstName)) {
+                    alert("Please enter letters only for the First Name.");
+                    return true;
+                }
 
-            if (!regexName.test(firstName)) {
-                alert("Please enter letters only for the First Name.");
-                return false;
-            }
-
-            if (!regexName.test(lastName)) {
-                alert("Please enter letters only for the Last Name.");
-                return false;
-            }
+                if (!regexName.test(lastName)) {
+                    alert("Please enter letters only for the Last Name.");
+                    return true;
+                }
+            
+            */
+            
 
             return true;
         }

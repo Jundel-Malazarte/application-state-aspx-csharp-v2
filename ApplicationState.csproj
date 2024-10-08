@@ -67,12 +67,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="Addtocart.aspx" />
     <Content Include="Appstate.aspx" />
     <Content Include="Global.asax" />
     <Content Include="OldAppstate.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addtocart.aspx.cs">
+      <DependentUpon>Addtocart.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Addtocart.aspx.designer.cs">
+      <DependentUpon>Addtocart.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Appstate.aspx.cs">
       <DependentUpon>Appstate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
