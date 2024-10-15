@@ -19,7 +19,11 @@ namespace ApplicationState
                     txtAddress.Text = Application["Address"].ToString();
 
                     // Display the submitted data in the label
-                    lblResult.Text = $"Submitted Details: {intNum.Text} {txtFirstName.Text} {txtLastName.Text} Course: {ddlCourse.SelectedItem.Text}: You live in: {txtAddress.Text}";
+                    lblIDNumber.Text = intNum.Text;
+                    lblFirstName.Text = txtFirstName.Text;
+                    lblLastName.Text = txtLastName.Text;
+                    lblCourse.Text = ddlCourse.SelectedItem.Text;
+                    lblAddress.Text = txtAddress.Text;
                 }
             }
         }
@@ -40,8 +44,15 @@ namespace ApplicationState
             Application["Course"] = course;
             Application["Address"] = address;
 
-            // Redirect to the same page to reflect the changes
-            Response.Redirect("Appstate.aspx");
+            // Display the submitted data in the label
+            lblIDNumber.Text = idnumber;
+            lblFirstName.Text = firstName;
+            lblLastName.Text = lastName;
+            lblCourse.Text = course;
+            lblAddress.Text = address;
+
+            // Optionally, you can also redirect after submission to show updated results
+            // Response.Redirect("Appstate.aspx");
         }
     }
 }

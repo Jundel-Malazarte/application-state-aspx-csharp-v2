@@ -55,6 +55,7 @@
         padding: 30px;
         border-radius: 10px;
         position: absolute;
+        border: solid 1px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);

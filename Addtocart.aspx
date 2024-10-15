@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Addtocart.aspx.cs" Inherits="ApplicationState.Addtocart" %>
+﻿ <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Addtocart.aspx.cs" Inherits="ApplicationState.Addtocart" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -34,6 +34,7 @@
             justify-content: center;
             padding: 10px;
             border-radius: 10px;
+            border: solid 0.2px;
         }
         .form h2 {
             margin: 10px;
@@ -45,7 +46,7 @@
             margin: 5px;
             margin-top: 10px;
             margin-left: 20px;
-            background-color: #3d5afe;
+            background-color: #00c853;
             color: #eceff1;
             border: none;
             border-radius: 5px;
