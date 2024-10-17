@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
     <title>Application State</title>
+    <link rel="icon" href="./img/Dotnet.png" />
     <script type="text/javascript">
         function validateForm() {
             var idNumber = document.getElementById('<%= TextBox0.ClientID %>').value;

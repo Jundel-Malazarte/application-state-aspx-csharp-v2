@@ -69,10 +69,16 @@
   <ItemGroup>
     <Content Include=".gitignore" />
     <Content Include="Addtocart.aspx" />
+    <Content Include="Addtotable.aspx" />
     <Content Include="Appstate.aspx" />
     <Content Include="Dashboard.aspx" />
     <Content Include="Global.asax" />
     <Content Include="img\background.jpg" />
+    <Content Include="img\colgate.jpg" />
+    <Content Include="img\Dotnet.png" />
+    <Content Include="img\gatorade.jpg" />
+    <Content Include="img\head&amp;shoulder.jpg" />
+    <Content Include="img\palmolive.jpg" />
     <Content Include="Login.aspx" />
     <Content Include="OldAppstate.aspx" />
     <Content Include="Signup.aspx" />
@@ -85,6 +91,13 @@
     </Compile>
     <Compile Include="Addtocart.aspx.designer.cs">
       <DependentUpon>Addtocart.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Addtotable.aspx.cs">
+      <DependentUpon>Addtotable.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Addtotable.aspx.designer.cs">
+      <DependentUpon>Addtotable.aspx</DependentUpon>
     </Compile>
     <Compile Include="Appstate.aspx.cs">
       <DependentUpon>Appstate.aspx</DependentUpon>
