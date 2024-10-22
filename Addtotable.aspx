@@ -152,7 +152,7 @@
 
             <div class="output-box">
                 <h2>Cart</h2>
-                <asp:GridView ID="Gv1" runat="server" AutoGenerateColumns="False">
+                <asp:GridView ID="Gv1" runat="server" AutoGenerateColumns="False" OnRowCommand="Gv1_RowCommand" OnRowDeleting="Gv1_RowDeleting">
                     <Columns>
                         <asp:BoundField DataField="Product_number" HeaderText="Product Number" />
                         <asp:BoundField DataField="Product_name" HeaderText="Product Name" />

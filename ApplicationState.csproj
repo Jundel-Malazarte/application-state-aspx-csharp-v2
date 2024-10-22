@@ -72,6 +72,7 @@
     <Content Include="Addtotable.aspx" />
     <Content Include="Appstate.aspx" />
     <Content Include="Dashboard.aspx" />
+    <Content Include="Detailstotable.aspx" />
     <Content Include="Global.asax" />
     <Content Include="img\background.jpg" />
     <Content Include="img\colgate.jpg" />
@@ -113,6 +114,13 @@
     <Compile Include="Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Detailstotable.aspx.cs">
+      <DependentUpon>Detailstotable.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Detailstotable.aspx.designer.cs">
+      <DependentUpon>Detailstotable.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -148,7 +156,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
