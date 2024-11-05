@@ -94,8 +94,8 @@
         #Colgate, #Palmolive, #Gatorade, #HeadShoulder {
             height: 100px;
             width: 100px;
-            margin: 5px;
-            padding: 10px;
+            margin: 2px;
+            padding: 5px;
             border-radius: 10px;
         }
 
