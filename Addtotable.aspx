@@ -81,10 +81,6 @@
             cursor: pointer;
         }
 
-        .delete-btn {
-            background-color: #d50000;
-        }
-
         /* Product styles */
         .product-item {
             text-align: center;
@@ -99,9 +95,29 @@
             border-radius: 10px;
         }
 
-        .quantity-btn {
+        /* Decrement-BTN */
+        .decrement-btn { 
+            padding: 5px 10px;
+            background-color: #ff6e40;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .increment-btn {
             padding: 5px 10px;
             background-color: #3d5afe;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+
+        .delete-btn { 
+            padding: 5px 10px;
+            background-color: #d50000;
             color: white;
             border: none;
             border-radius: 3px;
@@ -111,8 +127,10 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <form id="Form1" class="form" runat="server">
+    <form id="Form1" runat="server" class="form">
+        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" />
+
+        <div class="container">
             <h2 class="text-center">Items Available</h2>
             <div class="row text-center">
                 <div class="col-md-3 col-sm-6 product-item">
@@ -141,40 +159,43 @@
 
             <div class="output-box">
                 <h2 class="text-center">Cart</h2>
-                <asp:GridView ID="Gv1" runat="server" AutoGenerateColumns="False" CssClass="table table-bordered" OnRowCommand="Gv1_RowCommand" OnRowDeleting="Gv1_RowDeleting">
+                  <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                    <ContentTemplate>
+                    <asp:GridView ID="Gv1" runat="server" AutoGenerateColumns="False" 
+                        CssClass="table table-bordered" OnRowCommand="Gv1_RowCommand">
                     <Columns>
                         <asp:BoundField DataField="Product_number" HeaderText="Product Number" />
                         <asp:BoundField DataField="Product_name" HeaderText="Product Name" />
                         <asp:TemplateField HeaderText="Quantity">
                             <ItemTemplate>
-                                <button class="quantity-btn" type="button" onclick="decrementQty('<%# Eval("Product_number") %>')">-</button>
+                                <button class="decrement-btn" type="button" onclick="updateQuantity('<%# Eval("Product_number") %>', -1)">-</button>
                                 <asp:Label ID="lblQty" runat="server" Text='<%# Eval("Quantity") %>'></asp:Label>
-                                <button class="quantity-btn" type="button" onclick="incrementQty('<%# Eval("Product_number") %>')">+</button>
+                                <button class="increment-btn" type="button" onclick="updateQuantity('<%# Eval("Product_number") %>', 1)">+</button>
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:BoundField DataField="Total" HeaderText="Subtotal" />
                         <asp:TemplateField HeaderText="Action">
                             <ItemTemplate>
-                                <asp:Button ID="Button2" CssClass="action-btn delete-btn" Text="Delete" runat="server" CommandName="Delete" CommandArgument='<%# Eval("Product_number") %>' />
+                                <button class="delete-btn" onclick="deleteProduct('<%# Eval("Product_number") %>')">Delete</button>
                             </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
                 </asp:GridView>
-                <div id="total-container">
-                    <h3>Total: <asp:Label ID="lblTotal" runat="server" Text="0"></asp:Label></h3>
-                </div>
-            </div>
-        </form>
-    </div>
-    <!-- Bootstrap JS from CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+                <h3>Total: <asp:Label ID="lblTotal" runat="server" Text="0"></asp:Label></h3>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+    </form>
     <script>
-        function incrementQty(productNumber) {
-            __doPostBack('IncrementQty', productNumber);
+        function updateQuantity(productNumber, change) {
+            if (change === 1) {
+                __doPostBack('IncrementQty', productNumber);
+            } else if (change === -1) {
+                __doPostBack('DecrementQty', productNumber);
+            }
         }
-
-        function decrementQty(productNumber) {
-            __doPostBack('DecrementQty', productNumber);
+ 
+        function deleteProduct(productNumber) {
+            __doPostBack('DeleteProduct', productNumber);
         }
     </script>
 </body>
