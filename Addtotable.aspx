@@ -95,7 +95,7 @@
             border-radius: 10px;
         }
 
-        /* Decrement-BTN */
+        /* decrement-btn - increment-btn */
         .decrement-btn { 
             padding: 5px 10px;
             background-color: #ff6e40;
@@ -104,7 +104,6 @@
             border-radius: 3px;
             cursor: pointer;
         }
-
         .increment-btn {
             padding: 5px 10px;
             background-color: #3d5afe;
@@ -114,7 +113,7 @@
             cursor: pointer;
         }
 
-
+        /** Delete-btn */
         .delete-btn { 
             padding: 5px 10px;
             background-color: #d50000;
@@ -186,6 +185,7 @@
         </asp:UpdatePanel>
     </form>
     <script>
+        // This is function for decrement-btn, increment-btn
         function updateQuantity(productNumber, change) {
             if (change === 1) {
                 __doPostBack('IncrementQty', productNumber);
@@ -193,9 +193,9 @@
                 __doPostBack('DecrementQty', productNumber);
             }
         }
- 
+        // This function is for delete each item
         function deleteProduct(productNumber) {
-            __doPostBack('DeleteProduct', productNumber);
+                __doPostBack('DeleteProduct', productNumber);
         }
     </script>
 </body>

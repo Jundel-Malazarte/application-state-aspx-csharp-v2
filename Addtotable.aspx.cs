@@ -13,7 +13,7 @@ namespace ApplicationState
         {
             if (!IsPostBack)
             {
-                CreateTable();
+                LoadCartFromApplicationState();
             }
             else
             {
@@ -50,7 +50,7 @@ namespace ApplicationState
 
         private void AddRowToTable(string productName, decimal productPrice)
         {
-            tb = (DataTable)Session["Cart"] ?? CreateTable();
+            tb = (DataTable)Application["Cart"] ?? CreateTable();
 
             DataRow existingRow = tb.AsEnumerable()
                 .FirstOrDefault(row => row["Product_name"].ToString() == productName);
@@ -72,7 +72,7 @@ namespace ApplicationState
                 tb.Rows.Add(row);
             }
 
-            Session["Cart"] = tb; // Update session with the current cart
+            Application["Cart"] = tb; // Update Application state with the current cart
         }
 
         private DataTable CreateTable()
@@ -83,13 +83,21 @@ namespace ApplicationState
             tb.Columns.Add("Quantity", typeof(int));
             tb.Columns.Add("Total", typeof(decimal));
 
-            Session["Cart"] = tb;
+            Application["Cart"] = tb;
             return tb;
+        }
+
+        private void LoadCartFromApplicationState()
+        {
+            tb = (DataTable)Application["Cart"] ?? CreateTable();
+            Gv1.DataSource = tb;
+            Gv1.DataBind();
+            UpdateTotal();
         }
 
         protected void clear_Click(object sender, EventArgs e)
         {
-            Session["Cart"] = null;
+            Application["Cart"] = null;
             tb = CreateTable();
             Gv1.DataSource = tb;
             Gv1.DataBind();
@@ -108,7 +116,7 @@ namespace ApplicationState
 
         private void UpdateQuantity(string productNumber, int change)
         {
-            tb = (DataTable)Session["Cart"];
+            tb = (DataTable)Application["Cart"];
             foreach (DataRow row in tb.Rows)
             {
                 if (row["Product_number"].ToString() == productNumber)
@@ -125,7 +133,7 @@ namespace ApplicationState
                 }
             }
 
-            Session["Cart"] = tb;
+            Application["Cart"] = tb;
             Gv1.DataSource = tb;
             Gv1.DataBind();
             UpdateTotal();
@@ -133,14 +141,13 @@ namespace ApplicationState
 
         private void UpdateTotal()
         {
-            tb = (DataTable)Session["Cart"];
+            tb = (DataTable)Application["Cart"];
             decimal total = tb.AsEnumerable().Sum(row => Convert.ToDecimal(row["Total"]));
             lblTotal.Text = total.ToString("F2");
         }
 
         protected void Gv1_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            // This method will handle any custom row commands like delete
             if (e.CommandName == "Delete")
             {
                 string productNumber = e.CommandArgument.ToString();
@@ -150,7 +157,7 @@ namespace ApplicationState
 
         private void RemoveSingleQuantity(string productNumber)
         {
-            tb = (DataTable)Session["Cart"];
+            tb = (DataTable)Application["Cart"];
             DataRow rowToUpdate = tb.AsEnumerable()
                 .FirstOrDefault(row => row["Product_number"].ToString() == productNumber);
 
@@ -160,26 +167,22 @@ namespace ApplicationState
 
                 if (quantity > 1)
                 {
-                    // Decrease the quantity by 1 and update the total
                     rowToUpdate["Quantity"] = quantity - 1;
                     decimal pricePerItem = Convert.ToDecimal(rowToUpdate["Total"]) / quantity;
                     rowToUpdate["Total"] = pricePerItem * (quantity - 1);
                 }
                 else
                 {
-                    // If quantity is 1, remove the entire row
                     tb.Rows.Remove(rowToUpdate);
                 }
 
-                // Reindex product numbers after deletion
                 int i = 1;
                 foreach (DataRow row in tb.Rows)
                 {
                     row["Product_number"] = i++;
                 }
 
-                // Update the session with the modified cart
-                Session["Cart"] = tb;
+                Application["Cart"] = tb;
                 Gv1.DataSource = tb;
                 Gv1.DataBind();
                 UpdateTotal();
