@@ -1,192 +1,145 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace ApplicationState
 {
-    public partial class Addtotable : System.Web.UI.Page
+    public partial class CartPage : Page
     {
-        private DataTable tb;
+        private static int productCounter = 1;
+
+        protected Repeater RepeaterCart;
+        protected Label lblTotal;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                LoadCartFromApplicationState();
-            }
-            else
-            {
-                // Handle quantity change event triggered by JavaScript
-                string eventTarget = Request["__EVENTTARGET"];
-                string eventArgument = Request["__EVENTARGUMENT"];
-
-                if (eventTarget == "IncrementQty")
+                if (Application["CartTable"] == null)
                 {
-                    IncrementQty(eventArgument);
+                    Application["CartTable"] = CreateCartTable();
                 }
-                else if (eventTarget == "DecrementQty")
-                {
-                    DecrementQty(eventArgument);
-                }
-                else if (eventTarget == "DeleteProduct")
-                {
-                    RemoveSingleQuantity(eventArgument);
-                }
+                BindCartTable();
             }
-        }
-
-        protected void AddToCart_Click(object sender, CommandEventArgs e)
-        {
-            string[] args = e.CommandArgument.ToString().Split(',');
-            string productName = args[0];
-            decimal productPrice = decimal.Parse(args[1]);
-
-            AddRowToTable(productName, productPrice);
-            Gv1.DataSource = tb;
-            Gv1.DataBind();
-            UpdateTotal();
-        }
-
-        private void AddRowToTable(string productName, decimal productPrice)
-        {
-            tb = (DataTable)Application["Cart"] ?? CreateTable();
-
-            DataRow existingRow = tb.AsEnumerable()
-                .FirstOrDefault(row => row["Product_name"].ToString() == productName);
-
-            if (existingRow != null)
-            {
-                int currentQuantity = Convert.ToInt32(existingRow["Quantity"]);
-                currentQuantity++;
-                existingRow["Quantity"] = currentQuantity;
-                existingRow["Total"] = productPrice * currentQuantity;
-            }
-            else
-            {
-                DataRow row = tb.NewRow();
-                row["Product_number"] = tb.Rows.Count + 1;
-                row["Product_name"] = productName;
-                row["Quantity"] = 1;
-                row["Total"] = productPrice;
-                tb.Rows.Add(row);
-            }
-
-            Application["Cart"] = tb; // Update Application state with the current cart
-        }
-
-        private DataTable CreateTable()
-        {
-            tb = new DataTable();
-            tb.Columns.Add("Product_number", typeof(int));
-            tb.Columns.Add("Product_name", typeof(string));
-            tb.Columns.Add("Quantity", typeof(int));
-            tb.Columns.Add("Total", typeof(decimal));
-
-            Application["Cart"] = tb;
-            return tb;
-        }
-
-        private void LoadCartFromApplicationState()
-        {
-            tb = (DataTable)Application["Cart"] ?? CreateTable();
-            Gv1.DataSource = tb;
-            Gv1.DataBind();
-            UpdateTotal();
         }
 
         protected void clear_Click(object sender, EventArgs e)
         {
-            Application["Cart"] = null;
-            tb = CreateTable();
-            Gv1.DataSource = tb;
-            Gv1.DataBind();
-            lblTotal.Text = "0";
+            Application["CartTable"] = CreateCartTable();
+            BindCartTable();
         }
 
-        private void IncrementQty(string productNumber)
+        protected void AddToCart_Click(object sender, CommandEventArgs e)
         {
-            UpdateQuantity(productNumber, 1);
-        }
+            string[] productInfo = e.CommandArgument.ToString().Split(',');
+            string productName = productInfo[0];
+            decimal price = decimal.Parse(productInfo[1]);
 
-        private void DecrementQty(string productNumber)
-        {
-            UpdateQuantity(productNumber, -1);
-        }
+            DataTable cartTable = Application["CartTable"] as DataTable;
+            DataRow existingRow = cartTable.Select($"ProductName = '{productName}'").FirstOrDefault();
 
-        private void UpdateQuantity(string productNumber, int change)
-        {
-            tb = (DataTable)Application["Cart"];
-            foreach (DataRow row in tb.Rows)
+            if (existingRow != null)
             {
-                if (row["Product_number"].ToString() == productNumber)
-                {
-                    int quantity = Convert.ToInt32(row["Quantity"]) + change;
+                int currentQty = (int)existingRow["Quantity"];
+                existingRow["Quantity"] = currentQty + 1;
+                existingRow["Total"] = (decimal)existingRow["Total"] / currentQty * (currentQty + 1);
+            }
+            else
+            {
+                DataRow newRow = cartTable.NewRow();
+                newRow["ProductNumber"] = productCounter++;
+                newRow["ProductName"] = productName;
+                newRow["Quantity"] = 1;
+                newRow["Total"] = price;
+                cartTable.Rows.Add(newRow);
+            }
 
-                    if (quantity >= 1)
-                    {
-                        row["Quantity"] = quantity;
-                        decimal pricePerItem = Convert.ToDecimal(row["Total"]) / (quantity - change);
-                        row["Total"] = pricePerItem * quantity;
-                    }
+            Application["CartTable"] = cartTable;
+            BindCartTable();
+        }
+
+        private void BindCartTable()
+        {
+            DataTable cartTable = Application["CartTable"] as DataTable;
+            RepeaterCart.DataSource = cartTable;
+            RepeaterCart.DataBind();
+
+            decimal total = 0;
+            foreach (DataRow row in cartTable.Rows)
+            {
+                total += (decimal)row["Total"];
+            }
+
+            if (lblTotal != null)
+            {
+                lblTotal.Text = "Php " + total.ToString("N2");
+            }
+        }
+
+        private DataTable CreateCartTable()
+        {
+            DataTable cartTable = new DataTable();
+            cartTable.Columns.Add("ProductNumber", typeof(int));
+            cartTable.Columns.Add("ProductName", typeof(string));
+            cartTable.Columns.Add("Quantity", typeof(int));
+            cartTable.Columns.Add("Total", typeof(decimal));
+            return cartTable;
+        }
+
+        protected void IncrementQty(object sender, CommandEventArgs e)
+        {
+            int productNumber = int.Parse(e.CommandArgument.ToString().Split(',')[0]);
+            int change = int.Parse(e.CommandArgument.ToString().Split(',')[1]);
+            UpdateQuantity(productNumber, change);
+        }
+
+        protected void DecrementQty(object sender, CommandEventArgs e)
+        {
+            int productNumber = int.Parse(e.CommandArgument.ToString().Split(',')[0]);
+            int change = int.Parse(e.CommandArgument.ToString().Split(',')[1]);
+            UpdateQuantity(productNumber, change);
+        }
+
+        private void UpdateQuantity(int productNumber, int change)
+        {
+            DataTable cartTable = Application["CartTable"] as DataTable;
+            foreach (DataRow row in cartTable.Rows)
+            {
+                if ((int)row["ProductNumber"] == productNumber)
+                {
+                    int currentQty = (int)row["Quantity"];
+                    int newQty = currentQty + change;
+                    if (newQty < 1) newQty = 1; // Ensure quantity doesn't go below 1
+                    row["Quantity"] = newQty;
+                    row["Total"] = (decimal)row["Total"] / currentQty * newQty; // Update total with new quantity
                     break;
                 }
             }
-
-            Application["Cart"] = tb;
-            Gv1.DataSource = tb;
-            Gv1.DataBind();
-            UpdateTotal();
+            Application["CartTable"] = cartTable;
+            BindCartTable();
         }
 
-        private void UpdateTotal()
+        protected void DeleteProduct(object sender, CommandEventArgs e)
         {
-            tb = (DataTable)Application["Cart"];
-            decimal total = tb.AsEnumerable().Sum(row => Convert.ToDecimal(row["Total"]));
-            lblTotal.Text = total.ToString("F2");
+            int productNumber = int.Parse(e.CommandArgument.ToString());
+            DeleteProductFromCart(productNumber);
         }
 
-        protected void Gv1_RowCommand(object sender, GridViewCommandEventArgs e)
+        private void DeleteProductFromCart(int productNumber)
         {
-            if (e.CommandName == "Delete")
+            DataTable cartTable = Application["CartTable"] as DataTable;
+            foreach (DataRow row in cartTable.Rows)
             {
-                string productNumber = e.CommandArgument.ToString();
-                RemoveSingleQuantity(productNumber);
+                if ((int)row["ProductNumber"] == productNumber)
+                {
+                    cartTable.Rows.Remove(row);
+                    break;
+                }
             }
-        }
-
-        private void RemoveSingleQuantity(string productNumber)
-        {
-            tb = (DataTable)Application["Cart"];
-            DataRow rowToUpdate = tb.AsEnumerable()
-                .FirstOrDefault(row => row["Product_number"].ToString() == productNumber);
-
-            if (rowToUpdate != null)
-            {
-                int quantity = Convert.ToInt32(rowToUpdate["Quantity"]);
-
-                if (quantity > 1)
-                {
-                    rowToUpdate["Quantity"] = quantity - 1;
-                    decimal pricePerItem = Convert.ToDecimal(rowToUpdate["Total"]) / quantity;
-                    rowToUpdate["Total"] = pricePerItem * (quantity - 1);
-                }
-                else
-                {
-                    tb.Rows.Remove(rowToUpdate);
-                }
-
-                int i = 1;
-                foreach (DataRow row in tb.Rows)
-                {
-                    row["Product_number"] = i++;
-                }
-
-                Application["Cart"] = tb;
-                Gv1.DataSource = tb;
-                Gv1.DataBind();
-                UpdateTotal();
-            }
+            Application["CartTable"] = cartTable;
+            BindCartTable();
         }
     }
 }
