@@ -44,7 +44,7 @@ namespace ApplicationState
             {
                 int currentQty = (int)existingRow["Quantity"];
                 existingRow["Quantity"] = currentQty + 1;
-                existingRow["Total"] = (decimal)existingRow["Total"] / currentQty * (currentQty + 1);
+                existingRow["Total"] = price * (currentQty + 1); // Recalculate total for the item
             }
             else
             {
@@ -60,63 +60,52 @@ namespace ApplicationState
             BindCartTable();
         }
 
-        private void BindCartTable()
-        {
-            DataTable cartTable = Application["CartTable"] as DataTable;
-            RepeaterCart.DataSource = cartTable;
-            RepeaterCart.DataBind();
-
-            decimal total = 0;
-            foreach (DataRow row in cartTable.Rows)
-            {
-                total += (decimal)row["Total"];
-            }
-
-            if (lblTotal != null)
-            {
-                lblTotal.Text = "Php " + total.ToString("N2");
-            }
-        }
-
-        private DataTable CreateCartTable()
-        {
-            DataTable cartTable = new DataTable();
-            cartTable.Columns.Add("ProductNumber", typeof(int));
-            cartTable.Columns.Add("ProductName", typeof(string));
-            cartTable.Columns.Add("Quantity", typeof(int));
-            cartTable.Columns.Add("Total", typeof(decimal));
-            return cartTable;
-        }
-
         protected void IncrementQty(object sender, CommandEventArgs e)
         {
-            int productNumber = int.Parse(e.CommandArgument.ToString().Split(',')[0]);
-            int change = int.Parse(e.CommandArgument.ToString().Split(',')[1]);
-            UpdateQuantity(productNumber, change);
+            UpdateQuantity(e.CommandArgument.ToString(), 1);
         }
 
         protected void DecrementQty(object sender, CommandEventArgs e)
         {
-            int productNumber = int.Parse(e.CommandArgument.ToString().Split(',')[0]);
-            int change = int.Parse(e.CommandArgument.ToString().Split(',')[1]);
-            UpdateQuantity(productNumber, change);
+            UpdateQuantity(e.CommandArgument.ToString(), -1);
         }
 
-        private void UpdateQuantity(int productNumber, int change)
+        private void UpdateQuantity(string commandArgument, int change)
         {
+            int productNumber = int.Parse(commandArgument.Split(',')[0]);
             DataTable cartTable = Application["CartTable"] as DataTable;
-            foreach (DataRow row in cartTable.Rows)
+
+            DataRow row = cartTable.Select($"ProductNumber = {productNumber}").FirstOrDefault();
+            if (row != null)
             {
-                if ((int)row["ProductNumber"] == productNumber)
+                int currentQty = (int)row["Quantity"];
+                int newQty = currentQty + change;
+
+                if (newQty > 0)
                 {
-                    int currentQty = (int)row["Quantity"];
-                    int newQty = currentQty + change;
-                    if (newQty < 1) newQty = 1; // Ensure quantity doesn't go below 1
                     row["Quantity"] = newQty;
-                    row["Total"] = (decimal)row["Total"] / currentQty * newQty; // Update total with new quantity
-                    break;
+                    decimal price = (decimal)row["Total"] / currentQty;  // Get the price per item
+                    row["Total"] = price * newQty;
                 }
             }
+
+            Application["CartTable"] = cartTable;
+            BindCartTable();
+        }
+
+        protected void UpdateProduct(object sender, CommandEventArgs e)
+        {
+            int productNumber = int.Parse(e.CommandArgument.ToString());
+            DataTable cartTable = Application["CartTable"] as DataTable;
+
+            DataRow row = cartTable.Select($"ProductNumber = {productNumber}").FirstOrDefault();
+            if (row != null)
+            {
+                int currentQty = (int)row["Quantity"];
+                decimal price = (decimal)row["Total"] / currentQty;  // Get the price per item
+                row["Total"] = price * currentQty; // Recalculate the total (even though it's already done in other methods)
+            }
+
             Application["CartTable"] = cartTable;
             BindCartTable();
         }
@@ -124,22 +113,41 @@ namespace ApplicationState
         protected void DeleteProduct(object sender, CommandEventArgs e)
         {
             int productNumber = int.Parse(e.CommandArgument.ToString());
-            DeleteProductFromCart(productNumber);
-        }
-
-        private void DeleteProductFromCart(int productNumber)
-        {
             DataTable cartTable = Application["CartTable"] as DataTable;
-            foreach (DataRow row in cartTable.Rows)
+
+            DataRow row = cartTable.Select($"ProductNumber = {productNumber}").FirstOrDefault();
+            if (row != null)
             {
-                if ((int)row["ProductNumber"] == productNumber)
-                {
-                    cartTable.Rows.Remove(row);
-                    break;
-                }
+                cartTable.Rows.Remove(row);
             }
+
             Application["CartTable"] = cartTable;
             BindCartTable();
+        }
+
+        private void BindCartTable()
+        {
+            DataTable cartTable = Application["CartTable"] as DataTable;
+            RepeaterCart.DataSource = cartTable;
+            RepeaterCart.DataBind();
+
+            // Update the total label after binding
+            decimal total = 0;
+            foreach (DataRow row in cartTable.Rows)
+            {
+                total += (decimal)row["Total"];
+            }
+            lblTotal.Text = "Php " + total.ToString("#,##0.00"); // Ensure formatting (Php without "$")
+        }
+
+        private DataTable CreateCartTable()
+        {
+            DataTable table = new DataTable();
+            table.Columns.Add("ProductNumber", typeof(int));
+            table.Columns.Add("ProductName", typeof(string));
+            table.Columns.Add("Quantity", typeof(int));
+            table.Columns.Add("Total", typeof(decimal));
+            return table;
         }
     }
 }

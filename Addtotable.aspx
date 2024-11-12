@@ -44,8 +44,8 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            /* Center */
-            margin-top: 10%;
+            /* Center the form */
+            margin-top: 8%;
         }
 
         /** Button submit  */
@@ -59,6 +59,7 @@
         }
         /* clear button */
         .Btn-clear {
+            margin-left: 38px;
             height: 40px;
             width: 80px;
             margin-top: 20px;
@@ -96,6 +97,15 @@
             background-color: #304ffe;
             color: white;
             border: none;
+            cursor: pointer;
+        }
+
+        .btn-update {
+            padding: 5px 10px;
+            background-color: #304ffe;
+            color: white;
+            border: none;
+            border-radius: 3px;
             cursor: pointer;
         }
 
@@ -216,22 +226,29 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <asp:Repeater ID="RepeaterCart" runat="server">
-                                    <ItemTemplate>
-                                        <tr>
-                                            <td><%# Eval("ProductNumber") %></td>
-                                            <td><%# Eval("ProductName") %></td>
-                                            <td>
-                                                <!-- Decrement and Increment Buttons -->
-                                                <asp:Button ID="btnDecrement" runat="server" Text="-" CommandName="DecrementQty" CommandArgument='<%# Eval("ProductNumber") + ",-1" %>' OnCommand="DecrementQty" CssClass="btn-decrement" />
-                                                <span><%# Eval("Quantity") %></span>
-                                                <asp:Button ID="btnIncrement" runat="server" Text="+" CommandName="IncrementQty" CommandArgument='<%# Eval("ProductNumber") + ",1" %>' OnCommand="IncrementQty" CssClass="btn-increment" />
-                                            </td>
-                                            <td><%# "Php " + Eval("Total", "{0:N2}") %></td> 
-                                            <td><asp:Button ID="btnDelete" runat="server" Text="Delete" CommandName="DeleteProduct" CommandArgument='<%# Eval("ProductNumber") %>' OnCommand="DeleteProduct" CssClass="btn-delete" /></td>
-                                        </tr>
-                                    </ItemTemplate>
-                                </asp:Repeater>
+                               <asp:Repeater ID="RepeaterCart" runat="server">
+                                <ItemTemplate>
+                                    <tr>
+                                        <td><%# Eval("ProductNumber") %></td>
+                                        <td><%# Eval("ProductName") %></td>
+                                        <td>
+                                            <!-- Decrement and Increment Buttons -->
+                                            <asp:Button ID="btnDecrement" runat="server" Text="-" CommandName="DecrementQty" CommandArgument='<%# Eval("ProductNumber") + ",-1" %>' OnCommand="DecrementQty" CssClass="btn-decrement" />
+                                            <span><%# Eval("Quantity") %></span>
+                                            <asp:Button ID="btnIncrement" runat="server" Text="+" CommandName="IncrementQty" CommandArgument='<%# Eval("ProductNumber") + ",1" %>' OnCommand="IncrementQty" CssClass="btn-increment" />
+                                        </td>
+                                        <td>
+                                            <!-- Displaying total as php currency format -->
+                                            <span><%# Eval("Total", "php{0:N2}") %></span>
+                                        </td>
+                                        <td>
+                                            <asp:Button ID="btnUpdate" runat="server" Text="Update" CommandName="UpdateProduct" CommandArgument='<%# Eval("ProductNumber") %>' OnCommand="UpdateProduct" CssClass="btn-update" />
+                                            <asp:Button ID="btnDelete" runat="server" Text="Delete" CommandName="DeleteProduct" CommandArgument='<%# Eval("ProductNumber") %>' OnCommand="DeleteProduct" CssClass="btn-delete" />
+                                        </td>                      
+                                    </tr>
+                                </ItemTemplate>
+                            </asp:Repeater>
+
                             </tbody>
                         </table>
                     </ContentTemplate>
