@@ -209,7 +209,7 @@
                     <asp:Button CssClass="action-btn" Text="Add Shampoo" runat="server" CommandName="Add" CommandArgument="Head&Shoulder,12" OnCommand="AddToCart_Click" />
                 </div>
             </div>
-           <asp:Button CssClass="Btn-clear" Text="Clear" runat="server" ID="clear" OnClick="clear_Click" />
+           <asp:Button CssClass="Btn-clear" Text="Clear" runat="server" ID="clear" OnClick="Clear_Click" />
 
             <div class="output-box">
                 <h2 class="text-center">Cart</h2>
@@ -226,7 +226,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                               <asp:Repeater ID="RepeaterCart" runat="server">
+                               <asp:Repeater ID="Repeater" runat="server">
                                 <ItemTemplate>
                                     <tr>
                                         <td><%# Eval("ProductNumber") %></td>
@@ -239,10 +239,9 @@
                                         </td>
                                         <td>
                                             <!-- Displaying total as php currency format -->
-                                            <span><%# Eval("Total", "php{0:N2}") %></span>
+                                            <span><%# Eval("Total", "Php {0:N2}") %></span>
                                         </td>
                                         <td>
-                                            <asp:Button ID="btnUpdate" runat="server" Text="Update" CommandName="UpdateProduct" CommandArgument='<%# Eval("ProductNumber") %>' OnCommand="UpdateProduct" CssClass="btn-update" />
                                             <asp:Button ID="btnDelete" runat="server" Text="Delete" CommandName="DeleteProduct" CommandArgument='<%# Eval("ProductNumber") %>' OnCommand="DeleteProduct" CssClass="btn-delete" />
                                         </td>                      
                                     </tr>
@@ -255,10 +254,11 @@
                 </asp:UpdatePanel>
             </div>
 
-            <!-- Move the Total display section outside of the Repeater -->
+            <!-- Move the Total display section outside of the Repeater 
             <div class="text-center">
                 <h3>Total: <span><asp:Label ID="lblTotal" runat="server" Text="0"></asp:Label></span></h3>
             </div>
+            -->
         </div>
     </form>
     <script>
