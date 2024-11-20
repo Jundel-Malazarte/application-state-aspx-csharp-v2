@@ -15,15 +15,6 @@ namespace ApplicationState
     {
 
         /// <summary>
-        /// Head1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlHead Head1;
-
-        /// <summary>
         /// Form1 control.
         /// </summary>
         /// <remarks>
@@ -42,13 +33,22 @@ namespace ApplicationState
         protected global::System.Web.UI.ScriptManager ScriptManager1;
 
         /// <summary>
-        /// Colgate control.
+        /// ColgateImage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Image Colgate;
+        protected global::System.Web.UI.WebControls.Image ColgateImage;
+
+        /// <summary>
+        /// AddColgate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button AddColgate;
 
         /// <summary>
         /// Palmolive control.
@@ -60,6 +60,15 @@ namespace ApplicationState
         protected global::System.Web.UI.WebControls.Image Palmolive;
 
         /// <summary>
+        /// AddPalmolive control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button AddPalmolive;
+
+        /// <summary>
         /// Gatorade control.
         /// </summary>
         /// <remarks>
@@ -67,6 +76,15 @@ namespace ApplicationState
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image Gatorade;
+
+        /// <summary>
+        /// AddGatorade control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button AddGatorade;
 
         /// <summary>
         /// HeadShoulder control.
@@ -78,13 +96,22 @@ namespace ApplicationState
         protected global::System.Web.UI.WebControls.Image HeadShoulder;
 
         /// <summary>
-        /// clear control.
+        /// AddHeadShoulder control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button clear;
+        protected global::System.Web.UI.WebControls.Button AddHeadShoulder;
+
+        /// <summary>
+        /// ClearCart control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ClearCart;
 
         /// <summary>
         /// UpdatePanel1 control.
@@ -103,6 +130,15 @@ namespace ApplicationState
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater Repeater;
+
+        /// <summary>
+        /// UpdatePanelTotal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel UpdatePanelTotal;
 
         /// <summary>
         /// lblTotal control.

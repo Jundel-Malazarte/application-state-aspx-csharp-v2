@@ -8,7 +8,7 @@ namespace ApplicationState
 {
     public partial class CartPage : Page
     {
-        private static int productCounter = 1; // Counter for product numbers
+        private static int productCounter = 1;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -24,114 +24,122 @@ namespace ApplicationState
 
         private DataTable CreateCartTable()
         {
-            DataTable table = new DataTable();
+            var table = new DataTable();
             table.Columns.Add("ProductNumber", typeof(int));
             table.Columns.Add("ProductName", typeof(string));
             table.Columns.Add("Quantity", typeof(int));
             table.Columns.Add("Price", typeof(decimal));
-            table.Columns.Add("Total", typeof(decimal));
+            table.Columns.Add("SubTotal", typeof(decimal));
+            table.Columns.Add("Total", typeof(decimal)); // Add Total column to match your UI
             return table;
         }
 
-        private void BindCartTable()
+        protected void BindCartTable()
         {
-            DataTable cartTable = Application["CartTable"] as DataTable;
+            var cartTable = (DataTable)Application["CartTable"];
+            UpdateTotals(cartTable);
             Repeater.DataSource = cartTable;
             Repeater.DataBind();
-            UpdateCartTotal(cartTable); // Update total after binding
+            UpdateOverallTotal(cartTable);
+
+            // Trigger partial postbacks for UpdatePanels
+            UpdatePanel1.Update();
+            UpdatePanelTotal.Update();
         }
 
-        private void UpdateCartTotal(DataTable cartTable)
+        private void UpdateTotals(DataTable cartTable)
         {
-            decimal totalAmount = cartTable.AsEnumerable().Sum(row => row.Field<decimal>("Total"));
-            lblTotal.Text = "Php " + totalAmount.ToString("N2");
+            foreach (DataRow row in cartTable.Rows)
+            {
+                // Ensure Total mirrors SubTotal or includes additional logic if needed
+                row["Total"] = row.Field<decimal>("SubTotal");
+            }
+        }
+
+        private void UpdateOverallTotal(DataTable cartTable)
+        {
+            decimal total = cartTable.AsEnumerable().Sum(row => row.Field<decimal>("SubTotal"));
+            lblTotal.Text = "Php " + total.ToString("N2");
         }
 
         protected void AddToCart_Click(object sender, CommandEventArgs e)
         {
-            string[] productInfo = e.CommandArgument.ToString().Split(',');
-            string productName = productInfo[0];
-            decimal price = decimal.Parse(productInfo[1]);
+            var args = e.CommandArgument.ToString().Split(',');
+            string productName = args[0];
+            decimal price = Convert.ToDecimal(args[1]);
 
-            DataTable cartTable = Application["CartTable"] as DataTable;
-            DataRow existingRow = cartTable.Select($"ProductName = '{productName}'").FirstOrDefault();
+            var cartTable = (DataTable)Application["CartTable"];
+            var row = cartTable.AsEnumerable().FirstOrDefault(r => r.Field<string>("ProductName") == productName);
 
-            if (existingRow != null)
+            if (row != null)
             {
-                int currentQty = (int)existingRow["Quantity"];
-                existingRow["Quantity"] = currentQty + 1;
-                existingRow["Total"] = price * (currentQty + 1);
+                int currentQuantity = Convert.ToInt32(row["Quantity"]);
+                row["Quantity"] = currentQuantity + 1;
+                row["SubTotal"] = (currentQuantity + 1) * price;
             }
             else
             {
-                DataRow newRow = cartTable.NewRow();
-                newRow["ProductNumber"] = productCounter++;
-                newRow["ProductName"] = productName;
-                newRow["Quantity"] = 1;
-                newRow["Price"] = price;
-                newRow["Total"] = price;
-                cartTable.Rows.Add(newRow);
+                cartTable.Rows.Add(productCounter++, productName, 1, price, price, price);
             }
+
+            Application["CartTable"] = cartTable;
+            BindCartTable(); // Refresh the cart and total
+        }
+
+        protected void UpdateQuantity_Click(object sender, CommandEventArgs e)
+        {
+            var args = e.CommandArgument.ToString().Split(',');
+            int productNumber = Convert.ToInt32(args[0]);
+            int change = Convert.ToInt32(args[1]);
+
+            var cartTable = (DataTable)Application["CartTable"];
+            var row = cartTable.AsEnumerable().FirstOrDefault(r => r.Field<int>("ProductNumber") == productNumber);
+
+            if (row != null)
+            {
+                int newQuantity = row.Field<int>("Quantity") + change;
+
+                if (newQuantity <= 0)
+                {
+                    cartTable.Rows.Remove(row);
+                }
+                else
+                {
+                    row["Quantity"] = newQuantity;
+                    row["SubTotal"] = newQuantity * row.Field<decimal>("Price");
+                }
+            }
+
+            Application["CartTable"] = cartTable;
+            BindCartTable(); // Refresh the cart and total
+        }
+
+        protected void DeleteProduct_Click(object sender, CommandEventArgs e)
+        {
+            int productNumber = Convert.ToInt32(e.CommandArgument);
+
+            var cartTable = (DataTable)Application["CartTable"];
+            var row = cartTable.AsEnumerable().FirstOrDefault(r => r.Field<int>("ProductNumber") == productNumber);
+
+            if (row != null)
+            {
+                cartTable.Rows.Remove(row);
+            }
+
+            Application["CartTable"] = cartTable; // Save changes back to Application state
             BindCartTable();
+
+            if (cartTable.Rows.Count == 0)
+            {
+                lblTotal.Text = "Php 0.00";
+            }
         }
 
         protected void Clear_Click(object sender, EventArgs e)
         {
             Application["CartTable"] = CreateCartTable();
             BindCartTable();
-        }
-
-        protected void IncrementQty(object sender, CommandEventArgs e)
-        {
-            UpdateQuantity(e.CommandArgument.ToString(), 1);
-        }
-
-        protected void DecrementQty(object sender, CommandEventArgs e)
-        {
-            UpdateQuantity(e.CommandArgument.ToString(), -1);
-        }
-
-        private void UpdateQuantity(string productInfo, int change)
-        {
-            string[] productData = productInfo.Split(',');
-            int productNumber = int.Parse(productData[0]);
-            DataTable cartTable = Application["CartTable"] as DataTable;
-
-            DataRow row = cartTable.AsEnumerable()
-                .FirstOrDefault(r => r.Field<int>("ProductNumber") == productNumber);
-
-            if (row != null)
-            {
-                int currentQty = row.Field<int>("Quantity");
-                decimal price = row.Field<decimal>("Price");
-
-                int newQty = currentQty + change;
-                if (newQty > 0)
-                {
-                    row["Quantity"] = newQty;
-                    row["Total"] = newQty * price;
-                }
-                else
-                {
-                    cartTable.Rows.Remove(row);
-                }
-            }
-            BindCartTable();
-        }
-
-        protected void DeleteProduct(object sender, CommandEventArgs e)
-        {
-            int productNumber = int.Parse(e.CommandArgument.ToString());
-            DataTable cartTable = Application["CartTable"] as DataTable;
-
-            DataRow row = cartTable.AsEnumerable()
-                .FirstOrDefault(r => r.Field<int>("ProductNumber") == productNumber);
-
-            if (row != null)
-            {
-                cartTable.Rows.Remove(row);
-            }
-            BindCartTable();
+            lblTotal.Text = "Php 0.00"; // Reset total to zero after clearing
         }
     }
 }
